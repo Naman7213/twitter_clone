@@ -51,13 +51,23 @@ router.post("/login", (req, res) => {
           .status(404)
           .json({ message: "User doesn't exist, check your email" });
       } else {
-        const user_id = result[0]._id;
-        const jwttoken = jwt.sign({ email, user_id }, process.env.SECRET_KEY, {
-          expiresIn: "1h",
-        });
-        return res
-          .status(201)
-          .json({ message: "User login successful", jwttoken });
+        if (result[0].pwd != pwd) {
+          return res
+            .status(404)
+            .json({ messsage: "Wrong Login Credentials, try again" });
+        } else {
+          const user_id = result[0]._id;
+          const jwttoken = jwt.sign(
+            { email, user_id },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: "1h",
+            }
+          );
+          return res
+            .status(201)
+            .json({ message: "User login successful", jwttoken });
+        }
       }
     })
     .catch((error) => {
@@ -66,9 +76,5 @@ router.post("/login", (req, res) => {
         .json({ message: "Server error, not able to login", error });
     });
 });
-
-
-
-
 
 module.exports = router;
