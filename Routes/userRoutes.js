@@ -53,7 +53,7 @@ router.post("/login", (req, res) => {
       } else {
         const user_id = result[0]._id;
         const jwttoken = jwt.sign(
-          { email, pwd, user_id },
+          { email, user_id },
           process.env.SECRET_KEY,
           { expiresIn: "1h" }
         );
@@ -68,5 +68,13 @@ router.post("/login", (req, res) => {
         .json({ message: "Server error, not able to login", error });
     });
 });
+
+// router.get("/secureroute", (req, res) => {
+//   const token = req.headers.authorization;
+//   const get_token = token.split(" ");
+//   const my_token = get_token[1];
+//   const decode = jwt.verify(my_token, process.env.SECRET_KEY);
+//   return res.status(200).json({ message: decode });
+// });
 
 module.exports = router;
