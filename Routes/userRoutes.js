@@ -52,11 +52,9 @@ router.post("/login", (req, res) => {
           .json({ message: "User doesn't exist, check your email" });
       } else {
         const user_id = result[0]._id;
-        const jwttoken = jwt.sign(
-          { email, user_id },
-          process.env.SECRET_KEY,
-          { expiresIn: "1h" }
-        );
+        const jwttoken = jwt.sign({ email, user_id }, process.env.SECRET_KEY, {
+          expiresIn: "1h",
+        });
         return res
           .status(201)
           .json({ message: "User login successful", jwttoken });
@@ -69,12 +67,8 @@ router.post("/login", (req, res) => {
     });
 });
 
-// router.get("/secureroute", (req, res) => {
-//   const token = req.headers.authorization;
-//   const get_token = token.split(" ");
-//   const my_token = get_token[1];
-//   const decode = jwt.verify(my_token, process.env.SECRET_KEY);
-//   return res.status(200).json({ message: decode });
-// });
+
+
+
 
 module.exports = router;
