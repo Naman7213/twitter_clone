@@ -38,13 +38,45 @@ router.post("/posttweet", (req, res) => {
 router.get("/gettweets", (req, res) => {
   Tweet.find()
     .then((result) => {
-      return res.status(200).json({ message: result });p
+      return res.status(200).json({ message: result });
+      p;
     })
     .catch((error) => {
       return res
         .status(500)
         .json({ message: "Server error, please try after some time", error });
     });
+});
+
+router.patch("/updatetweet", (req, res) => {
+  const { tweetid, content } = req.body;
+  const token = req.headers.authorization;
+  const get_token = token.split(" ");
+  const my_token = get_token[1];
+  const is_user_verified = jwt.verify(my_token, process.env.SECRET_KEY);
+  if (is_user_verified && is_user_verified.usertype === 1) {
+    Tweet.find({ tweetid: tweetid })
+      .then((result) => {
+        const updateTweet = {
+          _id: result[0]._id,
+          content: content,
+        };
+        Tweet.findByIdAndUpdate(result[0]._id, updateTweet)
+          .then(() => {
+            return res.status(204).json({ message: "Updation Successful" });
+          })
+          .catch((error) => {
+            return res.status(500).json({ message: "Can't update tweet" });
+          });
+      })
+      .catch((error) => {
+        return res
+          .status(500)
+          .json({ message: "Server error, can't update", error });
+      });
+  } else {
+    return res.status(300).json({ message: "User is not verified" });
+  }
 });
 
 module.exports = router;
