@@ -57,8 +57,9 @@ router.post("/login", (req, res) => {
             .json({ messsage: "Wrong Login Credentials, try again" });
         } else {
           const user_id = result[0]._id;
+          const usertype = result[0].userType;
           const jwttoken = jwt.sign(
-            { email, user_id },
+            { email, user_id, usertype },
             process.env.SECRET_KEY,
             {
               expiresIn: "1h",
