@@ -85,8 +85,9 @@ router.patch("/updatetweet", (req, res) => {
   }
 });
 
-router.delete("/deletetweet", (req, res) => {
-  const { _id, email } = req.body;
+router.delete("/deletetweet/:_id", (req, res) => {
+  const tweetid = req.params._id;
+  console.log("tweetid is ========== " + tweetid);
   const token = req.headers.authorization;
   const get_token = token.split(" ");
   const my_token = get_token[1];
@@ -95,42 +96,24 @@ router.delete("/deletetweet", (req, res) => {
     is_user_verified &&
     (is_user_verified.usertype === 1 || is_user_verified.usertype === 3)
   ) {
-    Tweet.find({ _id: _id })
+    Tweet.findOne({ tweetid: tweetid })
       .then((result) => {
-        if (email === result[0].email) {
-          Tweet.findByIdAndDelete(_id )
-            .then(() => {
-              return res
-                .status(200)
-                .json({ message: "Tweet deleted successfully" });
-            })
-            .catch((error) => {
-              return res
-                .status(500)
-                .json({ message: "Server error, can't delete", error });
-            });
-        } else {
-          return res.status(300).json({ message: "You are not authorized" });
-        }
+        console.log(result);
+        Tweet.findByIdAndDelete(tweetid)
+          .then(() => {
+            return res
+              .status(200)
+              .json({ message: "Tweet deleted successfully" });
+          })
+          .catch((error) => {
+            return res
+              .status(500)
+              .json({ message: "Server error, can't delete", error });
+          });
       })
       .catch((error) => {
         return res.status(500).json({ message: "Tweet Not Found", error });
       });
-    // Tweet.deleteOne({ tweetid: tweetid })
-    //   .then((result) => {
-    //     console.log(result);
-    //     if (email === result[0].email) {
-    //       console.log(1);
-    //       return res
-    //         .status(200)
-    //         .json({ message: "Tweet deleted successfully" });
-    //     } else {
-    //       console.log(2);
-    //       return res
-    //         .status(300)
-    //         .json({ message: "You are not authorized to delete" });
-    //     }
-    //   })
   } else {
     return res.status(300).json({ message: "User is not verified" });
   }
