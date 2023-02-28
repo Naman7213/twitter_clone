@@ -85,4 +85,55 @@ router.patch("/updatetweet", (req, res) => {
   }
 });
 
+router.delete("/deletetweet", (req, res) => {
+  const { _id, email } = req.body;
+  const token = req.headers.authorization;
+  const get_token = token.split(" ");
+  const my_token = get_token[1];
+  const is_user_verified = jwt.verify(my_token, process.env.SECRET_KEY);
+  if (
+    is_user_verified &&
+    (is_user_verified.usertype === 1 || is_user_verified.usertype === 3)
+  ) {
+    Tweet.find({ _id: _id })
+      .then((result) => {
+        if (email === result[0].email) {
+          Tweet.findByIdAndDelete(_id )
+            .then(() => {
+              return res
+                .status(200)
+                .json({ message: "Tweet deleted successfully" });
+            })
+            .catch((error) => {
+              return res
+                .status(500)
+                .json({ message: "Server error, can't delete", error });
+            });
+        } else {
+          return res.status(300).json({ message: "You are not authorized" });
+        }
+      })
+      .catch((error) => {
+        return res.status(500).json({ message: "Tweet Not Found", error });
+      });
+    // Tweet.deleteOne({ tweetid: tweetid })
+    //   .then((result) => {
+    //     console.log(result);
+    //     if (email === result[0].email) {
+    //       console.log(1);
+    //       return res
+    //         .status(200)
+    //         .json({ message: "Tweet deleted successfully" });
+    //     } else {
+    //       console.log(2);
+    //       return res
+    //         .status(300)
+    //         .json({ message: "You are not authorized to delete" });
+    //     }
+    //   })
+  } else {
+    return res.status(300).json({ message: "User is not verified" });
+  }
+});
+
 module.exports = router;
