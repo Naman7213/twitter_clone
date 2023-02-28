@@ -2,6 +2,7 @@ const express = require("express");
 const { default: mongoose } = require("mongoose");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
+const bcrypt = new require("bcrypt");
 const User = require("../MODELS/userSchema");
 
 router.use("/signup", (req, res) => {
@@ -13,26 +14,54 @@ router.use("/signup", (req, res) => {
           .status(422)
           .json({ message: "User already exists, try with different email" });
       } else if (result.length === 0) {
-        const newUser = new User({
-          _id: new mongoose.Types.ObjectId(),
-          name: name,
-          email: email,
-          phone: phone,
-          age: age,
-          gender: gender,
-          pwd: pwd,
-          userType: userType,
-        });
-        newUser
-          .save()
-          .then(() => {
-            return res.status(201).json({ message: "New user created" });
+        const saltrounds = 10;
+        bcrypt
+          .hash(pwd, saltrounds)
+          .then((result)=>{
+            const newUser = new User({
+              _id: new mongoose.Types.ObjectId(),
+              name: name,
+              email: email,
+              phone: phone,
+              age: age,
+              gender: gender,
+              pwd: result,
+              userType: userType,
+            });
+            newUser
+              .save()
+              .then(() => {
+                return res.status(201).json({ message: "New user created" });
+              })
+              .catch((error) => {
+                return res
+                  .status(500)
+                  .json({ message: "Failed to create new user", error });
+              });
           })
           .catch((error) => {
-            return res
-              .status(500)
-              .json({ message: "Failed to create new user", error });
+            return res.status(500).json({ message: "Server error", error });
           });
+        // const newUser = new User({
+        //   _id: new mongoose.Types.ObjectId(),
+        //   name: name,
+        //   email: email,
+        //   phone: phone,
+        //   age: age,
+        //   gender: gender,
+        //   pwd: pwd,
+        //   userType: userType,
+        // });
+        // newUser
+        //   .save()
+        //   .then(() => {
+        //     return res.status(201).json({ message: "New user created" });
+        //   })
+        //   .catch((error) => {
+        //     return res
+        //       .status(500)
+        //       .json({ message: "Failed to create new user", error });
+        //   });
       }
     })
     .catch((error) => {

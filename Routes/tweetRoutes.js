@@ -87,7 +87,6 @@ router.patch("/updatetweet", (req, res) => {
 
 router.delete("/deletetweet/:_id", (req, res) => {
   const tweetid = req.params._id;
-  console.log("tweetid is ========== " + tweetid);
   const token = req.headers.authorization;
   const get_token = token.split(" ");
   const my_token = get_token[1];
@@ -98,7 +97,6 @@ router.delete("/deletetweet/:_id", (req, res) => {
   ) {
     Tweet.findOne({ tweetid: tweetid })
       .then((result) => {
-        console.log(result);
         Tweet.findByIdAndDelete(tweetid)
           .then(() => {
             return res
