@@ -97,17 +97,23 @@ router.delete("/deletetweet/:_id", (req, res) => {
   ) {
     Tweet.findOne({ tweetid: tweetid })
       .then((result) => {
-        Tweet.findByIdAndDelete(tweetid)
-          .then(() => {
-            return res
-              .status(200)
-              .json({ message: "Tweet deleted successfully" });
-          })
-          .catch((error) => {
-            return res
-              .status(500)
-              .json({ message: "Server error, can't delete", error });
-          });
+        if (is_user_verified.user_id == result.user_id || is_user_verified.usertype === 3) {
+          Tweet.findByIdAndDelete(tweetid)
+            .then(() => {
+              return res
+                .status(200)
+                .json({ message: "Tweet deleted successfully" });
+            })
+            .catch((error) => {
+              return res
+                .status(500)
+                .json({ message: "Server error, can't delete", error });
+            });
+        } else {
+          return res
+            .status(300)
+            .json({ message: "User is not authorised to delete" });
+        }
       })
       .catch((error) => {
         return res.status(500).json({ message: "Tweet Not Found", error });
