@@ -3,9 +3,21 @@ const { default: mongoose } = require("mongoose");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = new require("bcrypt");
+const Joi = require("joi");
+const datavalidation = require("../Middleware/datavalidation");
 const User = require("../MODELS/userSchema");
 
-router.use("/signup", (req, res) => {
+const validatinSchema = Joi.object().keys({
+  name: Joi.string().alphanum().max(30).required(),
+  email: Joi.string().email().required(),
+  phone: Joi.number().required(),
+  age: Joi.number().required(),
+  gender: Joi.string().max(1).required(),
+  pwd: Joi.string().min(6).required(),
+  userType: Joi.number().max(1).required(),
+});
+
+router.use("/signup", datavalidation(validatinSchema), (req, res) => {
   const { name, email, phone, age, gender, pwd, userType } = req.body;
   User.find({ email: email })
     .then((result) => {
