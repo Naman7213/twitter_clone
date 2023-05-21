@@ -14,7 +14,7 @@ const validatinSchema = Joi.object().keys({
   age: Joi.number().required(),
   gender: Joi.string().max(1).required(),
   pwd: Joi.string().min(6).required(),
-  userType: Joi.number().max(1).required(),
+  userType: Joi.number().max(3).required(),
 });
 
 router.use("/signup", datavalidation(validatinSchema), (req, res) => {
@@ -98,24 +98,6 @@ router.post("/login", (req, res) => {
           .catch((error) => {
             return res.status(500).json({ message: "Server error", error });
           });
-        // if (result[0].pwd != pwd) {
-        //   return res
-        //     .status(404)
-        //     .json({ messsage: "Wrong Login Credentials, try again" });
-        // } else {
-        //   const user_id = result[0]._id;
-        //   const usertype = result[0].userType;
-        //   const jwttoken = jwt.sign(
-        //     { email, user_id, usertype },
-        //     process.env.SECRET_KEY,
-        //     {
-        //       expiresIn: "1h",
-        //     }
-        //   );
-        //   return res
-        //     .status(201)
-        //     .json({ message: "User login successful", jwttoken });
-        // }
       }
     })
     .catch((error) => {
