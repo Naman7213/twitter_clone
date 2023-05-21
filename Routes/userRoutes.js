@@ -4,7 +4,7 @@ const router = express.Router();
 const jwt = require("jsonwebtoken");
 const bcrypt = new require("bcrypt");
 const Joi = require("joi");
-const datavalidation = require("../Middleware/datavalidation");
+const validateRequest = require("../Middleware/datavalidation");
 const User = require("../MODELS/userSchema");
 
 const validatinSchema = Joi.object().keys({
@@ -17,7 +17,7 @@ const validatinSchema = Joi.object().keys({
   userType: Joi.number().max(3).required(),
 });
 
-router.use("/signup", datavalidation(validatinSchema), (req, res) => {
+router.use("/signup", validateRequest(validatinSchema), (req, res) => {
   const { name, email, phone, age, gender, pwd, userType } = req.body;
   User.find({ email: email })
     .then((result) => {
